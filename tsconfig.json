@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "outDir": "./dist", //指定编译输出文件的目录，这里设置为"./dist"，表示输出到名为"dist"的目录
+    "baseUrl": "./",
+    "sourceMap": true,
+    "removeComments": true, //移除注释
+    "declaration": true, //
+    "preserveConstEnums": true, //保留常量枚举声明
+    "skipLibCheck": true, //设置为true时，跳过对声明文件的检查，可以加快编译速度。
+    "experimentalDecorators": true, //设置为true时，启用实验性的装饰器语法支持。
+    "emitDecoratorMetadata": true, //设置为true时，在编译过程中生成用于反射的装饰器元数据。
+    "incremental": true //设置为true时，启用增量编译，可以提高重新编译的速度
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
+}

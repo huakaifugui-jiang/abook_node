@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc -b -v",
+    "build": "npx rimraf dist && tsc -b -v",
+    "build:dev": "npx rimraf dist && tsc -b -v -w",
+    "start": "npx concurrently \"npm run build:dev\" \"nodemon dist/main.js\"",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx --fix --quiet ./",
     "prepare": "husky install"
   },
@@ -31,12 +33,15 @@
     "@typescript-eslint/eslint-plugin": "^5.59.7",
     "@typescript-eslint/parser": "^5.59.7",
     "commitizen": "^4.3.0",
+    "concurrently": "^8.1.0",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-import": "^2.27.5",
     "husky": "^8.0.3",
+    "nodemon": "^2.0.22",
     "prettier": "^2.8.8",
+    "rimraf": "^5.0.1",
     "ts-node": "^10.9.1",
     "typescript": "*"
   },

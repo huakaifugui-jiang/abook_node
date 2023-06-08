@@ -142,3 +142,84 @@
     参考链接[https://www.ruanyifeng.com/blog/2012/05/internet_protocol_suite_part_i.html]
 
 ### NodeJS 中的传输层与应用层
+
+对于前端而言，通常接触的就是 http 协议，而 http 协议是基于 tcp 协议的。所以我们可以先从 tcp 协议来一步一步的去学习一下 http 协议。
+
+首先我们创建一个 tcp 服务器。tcp 是面向连接的协议，其在传输之前需要 3 次握手形成会话。只有在会话形成之后，服务端与客户端之间才能互相发送数据。在创建会话的过程中，服务端和客户端分别提供一个套接字(socket)，这两个套接字共同形成一个连接。服务端与客户端则通过套接字实现两者之间的连接操作。
+
+```typescript
+//服务端创建一个 tcp服务器
+const server = net.createServer(socket => {
+  console.log('和客户端连接成功');
+
+  socket.on('data', data => {
+    console.log('接收到了客户端的信息', data.toString());
+  });
+});
+
+server.on('connection', socket => {
+  console.log('创建了一次连接');
+});
+
+server.listen(8124, () => {
+  console.log('TCP server running on port 8124');
+});
+```
+
+这边直接测试 http 客户端连接 tcp 服务端了，运行 npm run start 后,我们直接在浏览器中输入http://127.0.0.1:8124/ 会发现已经建立了一次连接了，每刷新一次就会创建一个新的连接。我们可以看到客户端给我们发送的数据也就是 http 请求报文 ： 如下
+
+```shell
+GET / HTTP/1.1 # 请求方法 路径 和 http协议版本
+Host: 127.0.0.1:8124 # 请求的目标主机和端口
+Connection: keep-alive #请求完成后保持TCP连接 保持连接 可以不需要每次请求都重新创建连接
+Cache-Control: max-age=0 # 指示缓存的控制策略，max-age=0表示每次请求都需要向服务器验证是否有最新的资源。
+sec-ch-ua: "Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114" # 指示浏览器的用户代理信息
+sec-ch-ua-mobile: ?0 # 指示客户端浏览器的用户代理移动设备信息
+sec-ch-ua-platform: "Windows" # 客户端浏览器的用户代理操作系统平台信息
+Upgrade-Insecure-Requests: 1 # 请求升级为安全连接（HTTPS）
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 # 用户代理标识，指示浏览器和操作系统信息
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7  # 客户端可接受的媒体类型
+Sec-Fetch-Site: none # 指示请求来源的安全性
+Sec-Fetch-Mode: navigate # 指示请求的目标资源如何获取
+Sec-Fetch-User: ?1 # 指示请求来源的用户类型
+Sec-Fetch-Dest: document # 指示请求的目标资源类型
+Accept-Encoding: gzip, deflate, br  # 客户端可接受的内容编码方式
+Accept-Language: zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7 # 客户端可接受的自然语言
+```
+
+我们会发现此时我们在浏览器上是什么都看不到的，因为我们发送的数据并不符合 http 报文 所以我们可以在上面加上 符合 http 报文 的响应数据
+
+```typescript
+import net from 'net';
+
+const server = net.createServer(socket => {
+  console.log('和客户端连接成功');
+
+  socket.on('data', data => {
+    console.log('接收到了客户端的信息', data.toString());
+
+    // 构造HTTP响应
+    const responseBody = 'Hello, World!';
+    const response = `HTTP/1.1 200 OK\r\n\Content-Length: ${responseBody.length}\r\n\r\n${responseBody}`;
+
+    // 发送HTTP响应
+    socket.write(response);
+  });
+});
+
+server.on('connection', socket => {
+  console.log('创建了一次连接');
+});
+
+server.listen(8124, () => {
+  console.log('TCP server running on port 8124');
+});
+```
+
+此时我们就可以在页面上看到 Hello, World! 了，但是这样属实是十分麻烦，所以 Node 也给我们提供了 http 模块，它包含了对 HTTP 处理的封装。在 Node 中,Http 服务继承自 TCP 服务器，它能够与多个客户端保持连接，由于采用事件驱动，并不为每个连接创建 额外的线程或进程，保持很低的内存占用所以能实现高并发。
+
+http 模块是将 connection 到 request 的过程进行了封装，http 以 request 为单位进行服务(tcp 是 connection 为单位也就是每次连接)，它将套接字 socket 的读写抽象为了 ServerRequest 和 ServerResponse 对象，分别对应请求和响应操作。
+
+会将我们上述的请求报文进行 http_parser 解析，成为 key:value 的形式
+
+具体可以查看 node 文档 的 http 模块

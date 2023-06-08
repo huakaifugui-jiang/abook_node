@@ -1,28 +1,38 @@
-import net from 'net';
+import http from 'http';
+import url from 'url';
 
-const server = net.createServer(socket => {
-  console.log('Client connected');
+//根据请求方法 将业务逻辑进行分发
+// function get(req, res) {
+//   console.log('来到了GET逻辑');
+//   res.write('get');
+// }
 
-  socket.on('data', data => {
-    console.log('Received data');
+// function post(req, res) {
+//   console.log('来到了Post逻辑');
+//   res.write('post');
+// }
 
-    // 构造HTTP响应
-    const responseBody = 'Hello, World!';
-    const response = `HTTP/1.1 200 OK\r\n\Content-Length: ${responseBody.length}\r\n\r\n${responseBody}`;
+// http
+//   .createServer((req, res) => {
+//     switch (req.method) {
+//       case 'GET':
+//         get(req, res);
+//         break;
+//       case 'POST':
+//         post(req, res);
+//         break;
+//     }
 
-    // 发送HTTP响应
-    socket.write(response);
-  });
-});
+//     res.end();
+//   })
+//   .listen(8124);
 
-server.on('connection', socket => {
-  console.log('connetction');
-  socket.on('data', data => {
-    console.log('conection data',data.toString());
-  });
-});
+//根据路径进行判断。
 
-server.listen(8124, () => {
-  console.log('TCP server running on port 8124');
-});
+http
+  .createServer((req, res) => {
+    console.log(req.url, req.headers.host);
+    res.end();
+  })
+  .listen(8124);
 

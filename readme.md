@@ -223,3 +223,105 @@ http 模块是将 connection 到 request 的过程进行了封装，http 以 req
 会将我们上述的请求报文进行 http_parser 解析，成为 key:value 的形式
 
 具体可以查看 node 文档 的 http 模块
+
+### 业务逻辑分发
+
+在实际的运用场景中，我们不可以把所有的代码都集中在一起，所以我们会通过一定的方法将业务逻辑代码分发出去。
+
+1.  请求方法 分发
+    我们可以通过请求方法来觉得响应行为
+
+    ```typescript
+    //根据请求方法 将业务逻辑进行分发
+    function get(req, res) {
+      console.log('来到了GET逻辑');
+      res.write('get');
+    }
+    function post(req, res) {
+      console.log('来到了 Post 逻辑');
+      res.write('post');
+    }
+
+    http
+      .createServer((req, res) => {
+        switch (req.method) {
+          case 'GET':
+            get(req, res);
+            break;
+          case 'POST':
+            post(req, res);
+            break;
+        }
+
+        res.end();
+      })
+      .listen(8124);
+    ```
+
+2.  根据路径
+
+    ```typescript
+    http
+    .createServer((req, res) => {
+    const pathname = url.parse(req.url).pathname;
+    //在 dist 目录下创建一个 a.js 文件
+    fs.readFile(path.join(\_\_dirname, pathname + '.js'), (err, file) => {
+    if (err) {
+    res.writeHead(404);
+    res.end('404 NOT FOUND');
+    return;
+    }
+
+        res.writeHead(200);
+        res.end(file);
+
+    });
+    })
+    .listen(8124);
+    ```
+
+3.  根据路径选择控制器
+    还有一种比较常见的分发场景是根据路径来选择控制器，它预设路径为控制器和行为的组合，无须额外配置路由信息，如下所示：
+
+    ```
+    /controller/action/a/b/c
+    ```
+
+    这里的 controller 会对应到一个控制器，action 对应到控制器的行为，剩余的值会作为参数进行一些别的判断。这样我们的业务部分可以只关心具体的业务实现，如下所示
+
+    ```typescript
+    const handles = {
+      pagelist: {
+        getlist: function (req, res, ...args) {
+          console.log(args, 'getlist');
+
+          res.end('getList');
+        },
+      },
+      index: {
+        index: function (req, res, ...args) {
+          console.log(args, 'index');
+
+          res.end('index');
+        },
+      },
+    };
+
+    http
+      .createServer((req, res) => {
+        const pathname = url.parse(req.url).pathname;
+
+        const paths = pathname.split('/');
+        const controller = paths[1] || 'index'; //控制器
+        const action = paths[2] || 'index'; //行为
+        const args = paths.slice(3); //剩余的参数
+        if (handles[controller] && handles[controller][action]) {
+          //分化逻辑
+          handles[controller][action].apply(null, [req, res, ...args]);
+        } else {
+          res.writeHead(500);
+          res.end('control not found');
+        }
+      })
+      .listen(8124);
+    ```

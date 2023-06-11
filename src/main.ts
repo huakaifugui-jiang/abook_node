@@ -50,36 +50,61 @@ import path from 'path';
 //根据路径来选择控制器
 //例如 /controller/action/a/b/c 这里的controller会对应到一个控制器，action对应到控制器的行为，剩余的值会作为参数进行一些别的判断。
 
-const handles = {
-  pagelist: {
-    getlist: function (req, res, ...args) {
-      console.log(args, 'getlist');
+// const handles = {
+//   pagelist: {
+//     getlist: function (req, res, ...args) {
+//       console.log(args, 'getlist');
 
-      res.end('getList');
-    },
-  },
-  index: {
-    index: function (req, res, ...args) {
-      console.log(args, 'index');
+//       res.end('getList');
+//     },
+//   },
+//   index: {
+//     index: function (req, res, ...args) {
+//       console.log(args, 'index', req.headers, req.headers['transfer-encoding']);
+//       req.on('data', data => {
+//         console.log(data, 'data');
+//       });
+//       res.end('index');
+//     },
+//   },
+// };
 
-      res.end('index');
-    },
-  },
+// http
+//   .createServer((req, res) => {
+//     const pathname = url.parse(req.url).pathname;
+
+//     const paths = pathname.split('/');
+//     const controller = paths[1] || 'index'; //控制器
+//     const action = paths[2] || 'index'; //行为
+//     const args = paths.slice(3); //剩余的参数
+//     if (handles[controller] && handles[controller][action]) {
+//       //分化逻辑
+//       handles[controller][action].apply(null, [req, res, ...args]);
+//     } else {
+//       res.writeHead(500);
+//       res.end('control not found');
+//     }
+//   })
+//   .listen(8124);
+
+// MVC 手工映射
+const router = [];
+
+const use = function () {
+  console.log('use');
 };
 
 http
   .createServer((req, res) => {
-    const pathname = url.parse(req.url).pathname;
+    const pathname = url.parse(req.url).pathname; //URL
 
-    const paths = pathname.split('/');
-    const controller = paths[1] || 'index'; //控制器
-    const action = paths[2] || 'index'; //行为
-    const args = paths.slice(3); //剩余的参数
-    if (handles[controller] && handles[controller][action]) { //分化逻辑
-      handles[controller][action].apply(null, [req, res, ...args]);
-    } else {
-      res.writeHead(500);
-      res.end('control not found');
-    }
+    //根据URL找到对应的控制器和行为
+    router.forEach(route => {
+      if (pathname === route[0]) {
+        const action = route[1];
+        action(req, res);
+        return
+      }
+    });
   })
   .listen(8124);

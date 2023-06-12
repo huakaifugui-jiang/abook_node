@@ -2,6 +2,8 @@ import http from 'http';
 import url from 'url';
 import fs from 'fs';
 import path from 'path';
+import userSetting from './user/setting';
+import { pathToRegexp } from 'path-to-regexp';
 
 //根据请求方法 将业务逻辑进行分发
 // function get(req, res) {
@@ -90,20 +92,44 @@ import path from 'path';
 // MVC 手工映射
 const router = [];
 
-const use = function () {
-  console.log('use');
+const use = function (path, action) {
+  //为了实现动态路径 将路径转为正则表达式
+  const keys = [];
+  router.push([
+    {
+      reg: pathToRegexp(path, keys),
+      keys,
+    },
+    action,
+  ]);
 };
 
-http
-  .createServer((req, res) => {
-    const pathname = url.parse(req.url).pathname; //URL
+use('/user/setting', userSetting); //
+use('/user/:id/:hh', (req, res) => {
+  console.log(req.params);
+  res.end('user id');
+}); //动态路径匹配
 
+http
+  .createServer((req: any, res) => {
+    const pathname = url.parse(req.url).pathname; //URL
     //根据URL找到对应的控制器和行为
     router.forEach(route => {
-      if (pathname === route[0]) {
+      //如果匹配上
+      const reg = route[0].reg;
+      const keys = route[0].keys;
+      const match = reg.exec(pathname);
+
+      if (match) {
+        const params = {};
+
+        for (let i = 0; i < keys.length; i++) {
+          params[keys[i].name] = match[i + 1];
+        }
         const action = route[1];
+        req.params = params;
         action(req, res);
-        return
+        return;
       }
     });
   })

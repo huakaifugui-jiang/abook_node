@@ -14,10 +14,14 @@ specifiers:
   eslint-plugin-import: ^2.27.5
   husky: ^8.0.3
   nodemon: ^2.0.22
+  path-to-regexp: ^6.2.1
   prettier: ^2.8.8
   rimraf: ^5.0.1
   ts-node: ^10.9.1
   typescript: '*'
+
+dependencies:
+  path-to-regexp: 6.2.1
 
 devDependencies:
   '@commitlint/cli': 17.6.3
@@ -2569,6 +2573,10 @@ packages:
       lru-cache: 9.1.2
       minipass: 6.0.2
     dev: true
+
+  /path-to-regexp/6.2.1:
+    resolution: {integrity: sha512-JLyh7xT1kizaEvcaXOQwOc2/Yhw6KZOvPf1S8401UyLk86CU79LN3vl7ztXGm/pZ+YjoyAJ4rxmHwbkBXJX+yw==}
+    dev: false
 
   /path-type/4.0.0:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}

@@ -345,3 +345,73 @@ MVC 的模型主要思想是将业务逻辑按职责分离。
 ##### 根据 URL 做路由映射
 
 这里有两种实现方式 1.通过手工关联映射（express），一种是自然关联映射。前者会有一个对应的路由文件来将 URL 映射到对应的控制器，后者没有这样的文件
+
+1. 手功映射
+
+除了需要维护路由表之外基本没有任何的缺点。 但是要是 api 多起来是真的太多了。
+
+```typescript
+const router = [];
+
+const use = function (path, action) {
+  //为了实现动态路径 将路径转为正则表达式
+  const keys = [];
+  router.push([
+    {
+      reg: pathToRegexp(path, keys),
+      keys,
+    },
+    action,
+  ]);
+};
+
+use('/user/setting', userSetting); //
+use('/user/:id/:hh', (req, res) => {
+  console.log(req.params);
+  res.end('user id');
+}); //动态路径匹配
+
+http
+  .createServer((req: any, res) => {
+    const pathname = url.parse(req.url).pathname; //URL
+    //根据URL找到对应的控制器和行为
+    router.forEach(route => {
+      //如果匹配上
+      const reg = route[0].reg;
+      const keys = route[0].keys;
+      const match = reg.exec(pathname);
+
+      if (match) {
+        const params = {};
+
+        for (let i = 0; i < keys.length; i++) {
+          params[keys[i].name] = match[i + 1];
+        }
+        const action = route[1];
+        req.params = params;
+        action(req, res);
+        return;
+      }
+    });
+  })
+  .listen(8124);
+```
+
+2. 自然映射
+
+通过约定，我们将文件路径与 api 地址挂钩 这样就不用维护路由表了，但是缺点也很明显，如果接口 controller 需要改名那么文件也要跟着迁移
+
+```typescript
+http.createServer((req, res) => {
+  const pathname = url.parse(req.url).pathname; //URL
+  const paths = pathname.split('/');
+  const controller = paths[1] || 'index';
+  const action = paths[2] || 'index';
+  const params = paths.slice(3);
+
+  //通过路径获取文件
+
+  module = require('./controllers/' + controller);
+  //做接下来的处理
+});
+```

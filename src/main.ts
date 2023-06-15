@@ -90,47 +90,62 @@ import { pathToRegexp } from 'path-to-regexp';
 //   .listen(8124);
 
 // MVC 手工映射
-const router = [];
+// const router = [];
 
-const use = function (path, action) {
-  //为了实现动态路径 将路径转为正则表达式
-  const keys = [];
-  router.push([
-    {
-      reg: pathToRegexp(path, keys),
-      keys,
-    },
-    action,
-  ]);
-};
+// const use = function (path, action) {
+//   //为了实现动态路径 将路径转为正则表达式
+//   const keys = [];
+//   router.push([
+//     {
+//       reg: pathToRegexp(path, keys),
+//       keys,
+//     },
+//     action,
+//   ]);
+// };
 
-use('/user/setting', userSetting); //
-use('/user/:id/:hh', (req, res) => {
-  console.log(req.params);
-  res.end('user id');
-}); //动态路径匹配
+// use('/user/setting', userSetting); //
+// use('/user/:id/:hh', (req, res) => {
+//   console.log(req.params);
+//   res.end('user id');
+// }); //动态路径匹配
 
-http
-  .createServer((req: any, res) => {
-    const pathname = url.parse(req.url).pathname; //URL
-    //根据URL找到对应的控制器和行为
-    router.forEach(route => {
-      //如果匹配上
-      const reg = route[0].reg;
-      const keys = route[0].keys;
-      const match = reg.exec(pathname);
+// http
+//   .createServer((req: any, res) => {
+//     const pathname = url.parse(req.url).pathname; //URL
+//     //根据URL找到对应的控制器和行为
+//     router.forEach(route => {
+//       //如果匹配上
+//       const reg = route[0].reg;
+//       const keys = route[0].keys;
+//       const match = reg.exec(pathname);
 
-      if (match) {
-        const params = {};
+//       if (match) {
+//         const params = {};
 
-        for (let i = 0; i < keys.length; i++) {
-          params[keys[i].name] = match[i + 1];
-        }
-        const action = route[1];
-        req.params = params;
-        action(req, res);
-        return;
-      }
-    });
-  })
-  .listen(8124);
+//         for (let i = 0; i < keys.length; i++) {
+//           params[keys[i].name] = match[i + 1];
+//         }
+//         const action = route[1];
+//         req.params = params;
+//         action(req, res);
+//         return;
+//       }
+//     });
+//   })
+//   .listen(8124);
+
+//MVC 自然映射
+// 约定 路径形成路由
+// http.createServer((req, res) => {
+//   const pathname = url.parse(req.url).pathname; //URL
+//   const paths = pathname.split('/');
+//   const controller = paths[1] || 'index';
+//   const action = paths[2] || 'index';
+//   const params = paths.slice(3);
+
+//   //通过路径获取文件
+
+//   module = require('./controllers/' + controller);
+//   //做接下来的处理
+// });

@@ -149,3 +149,40 @@ import { pathToRegexp } from 'path-to-regexp';
 //   module = require('./controllers/' + controller);
 //   //做接下来的处理
 // });
+
+//RESTful
+
+// const routes = {
+//   all: [],
+// };
+// const app = {};
+
+// ['get', 'post', 'delete', 'put'].forEach(method => {
+//   app[method] = function (path, action) {
+//     routes[method].push([pathToRegexp(path), action]);
+//   };
+// });
+
+// app.get('/user/setting');
+// app.put('/user/setting');
+
+// const match = function (pathname, route): boolean {
+//   //与上述的MVC手工映射差不多我们这边是直接提取出来了
+
+//   return true;
+// };
+
+// http.createServer((req, res) => {
+//   const pathname = url.parse(req.url).path;
+//   const mehod = req.method.toLocaleLowerCase();
+//   if (routes.hasOwnProperty(mehod)) {
+//     //根据请求分发
+//     if (match(pathname, routes[mehod])) {
+//     } else {
+//     }
+//   } else {
+//     if (match(pathname, routes.all)) {
+//       return;
+//     }
+//   }
+// });

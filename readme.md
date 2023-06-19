@@ -415,3 +415,74 @@ http.createServer((req, res) => {
   //做接下来的处理
 });
 ```
+
+##### RESTful
+
+RESTful (representational state transfer) 表现层状态转化。它的设计哲学主要将服务端提供 内容实体看作一个资源，并表现再 URL 上。
+
+比如一个用户的地址：/users/jack
+
+这个地址代表了一个资源，对这个资源的操作主要体现再 HTTP 请求方法上，不是体现再 URL 上。
+过去我们对用户的增删改查或许是如下设计的
+
+POST /user/add?username=jack
+GET /user/remove?username=jack
+GET /user/get?username=jack
+
+操作的行为体现再 url 上面，主要用到的请求方法是 POST 和 GET。再 RESTful 设计中，它是如下的
+
+POST /user/jack
+DELETE /user/jack
+PUT /user/jack
+GET /user/jack
+
+它将请求方法引入设计中，参与资源的操作和更改资源的状态。
+
+再 RESTful 中，资源的具体格式由请求报头中的 Accept 字段和服务端的支持情况来决定。如果客户端同时接收 JSON 和 XML 格式的响应，那么它的 Accept 字段是如下：
+
+Accept：application/json,application/xml
+
+靠谱的服务端应该要顾及这个字段，然后根据自己能响应的格式做出响应。再响应报文中，通过 Content-Type 字段告知客户端是什么格式：
+
+Content-Type:application/json
+
+总结来说，RESTful 设计就是通过 URL 设计资源、请求方法定义资源操作，通过 Accept 决定资源的表现形式
+
+所以我们可以改进我们路由
+
+```typescript
+const routes = {
+  all: [],
+};
+const app = {};
+
+['get', 'post', 'delete', 'put'].forEach(method => {
+  app[method] = function (path, action) {
+    routes[method].push([pathToRegexp(path), action]);
+  };
+});
+
+app.get('/user/setting');
+app.put('/user/setting');
+
+const match = function (pathname, route): boolean {
+  //与上述的MVC手工映射差不多我们这边是直接提取出来了
+
+  return true;
+};
+
+http.createServer((req, res) => {
+  const pathname = url.parse(req.url).path;
+  const mehod = req.method.toLocaleLowerCase();
+  if (routes.hasOwnProperty(mehod)) {
+    //根据请求分发
+    if (match(pathname, routes[mehod])) {
+    } else {
+    }
+  } else {
+    if (match(pathname, routes.all)) {
+      return;
+    }
+  }
+});
+```

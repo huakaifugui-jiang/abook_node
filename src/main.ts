@@ -149,3 +149,31 @@ import { pathToRegexp } from 'path-to-regexp';
 //   module = require('./controllers/' + controller);
 //   //做接下来的处理
 // });
+
+//中间件
+//想要达到的效果 类型express
+//app.use(querystring)
+//app.use(cookie)
+//app.use(session)
+//app.get('/user/:username'.getUser)
+
+// interface App {
+//   use?: Function;
+// }
+
+// //路由对象
+// const routes = {
+//   all: [],
+// };
+
+// const app: App = {};
+
+// app.use = function () {};
+
+// const querystring = function (req, res, next) {
+//   console.log('querystring');
+//   next();
+// };
+
+// http.createServer((req, res) => {}).listen(8124);
+

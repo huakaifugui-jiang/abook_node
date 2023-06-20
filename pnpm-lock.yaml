@@ -8,6 +8,7 @@ specifiers:
   '@typescript-eslint/parser': ^5.59.7
   commitizen: ^4.3.0
   concurrently: ^8.1.0
+  cookie-parser: ^1.4.6
   cz-conventional-changelog: ^3.3.0
   eslint: ^8.0.1
   eslint-config-prettier: ^8.8.0
@@ -21,6 +22,7 @@ specifiers:
   typescript: '*'
 
 dependencies:
+  cookie-parser: 1.4.6
   path-to-regexp: 6.2.1
 
 devDependencies:
@@ -944,6 +946,23 @@ packages:
       split2: 3.2.2
       through2: 4.0.2
     dev: true
+
+  /cookie-parser/1.4.6:
+    resolution: {integrity: sha512-z3IzaNjdwUC2olLIB5/ITd0/setiaFMLYiZJle7xg5Fe9KWAceil7xszYfHHBtDFYLSgJduS2Ty0P1uJdPDJeA==}
+    engines: {node: '>= 0.8.0'}
+    dependencies:
+      cookie: 0.4.1
+      cookie-signature: 1.0.6
+    dev: false
+
+  /cookie-signature/1.0.6:
+    resolution: {integrity: sha512-QADzlaHc8icV8I7vbaJXJwod9HWYp8uCqf1xa4OfNu1T7JVxQIrUgOWtHdNDtPiywmFbiS12VjotIXLrKM3orQ==}
+    dev: false
+
+  /cookie/0.4.1:
+    resolution: {integrity: sha512-ZwrFkGJxUR3EIoXtO+yVE69Eb7KlixbaeAWfBQB9vVsNn/o+Yw69gBWSSDK825hQNdN+wF8zELf3dFNl/kxkUA==}
+    engines: {node: '>= 0.6'}
+    dev: false
 
   /cosmiconfig-typescript-loader/4.3.0_2xnkz64c4gtm7yiasfogytjuia:
     resolution: {integrity: sha512-NTxV1MFfZDLPiBMjxbHRwSh5LaLcPMwNdCutmnHJCKoVnlvldPWlllonKwrsRJ5pYZBIBGRWWU2tfvzxgeSW5Q==}

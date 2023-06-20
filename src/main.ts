@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import userSetting from './user/setting';
 import { pathToRegexp } from 'path-to-regexp';
+import cookieParse from 'cookie-parser';
 
 //根据请求方法 将业务逻辑进行分发
 // function get(req, res) {
@@ -225,7 +226,12 @@ const match = function (pathname, routes) {
 };
 
 const handle = function (req, res, stack) {
-  const next = function () {
+  const next = function (err?) {
+    if (err) {
+      //TODO 错误处理
+      return;
+    }
+
     const middleware = stack.shift(); //拿到首个中间件
 
     if (middleware) {
@@ -237,16 +243,18 @@ const handle = function (req, res, stack) {
 };
 
 const middleware1 = function (req, res, next) {
-  console.log('middleware1');
+  console.log('middleware1', req.cookies);
+
   next();
 };
 
 const middleware2 = function (req, res, next) {
-  console.log('middleware2');
+  console.log('middleware2', req.cookies);
   next();
 };
 
 app.use(middleware2);
+app.use(cookieParse());
 app.use(middleware1);
 
 http
@@ -262,3 +270,4 @@ http
     res.end('');
   })
   .listen(8124);
+

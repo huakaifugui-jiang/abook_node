@@ -501,3 +501,90 @@ const middleware = function (req, res, next) {
   next();
 };
 ```
+
+简单的实现 具体代码如下：
+
+```typescript
+//想要达到的效果 类型express
+// app.use(querystring);
+// app.use(cookie);
+// app.use(session);
+// app.get('/user/:username',getUser);
+interface App {
+  use?: (path: any) => void;
+}
+
+//路由对象
+const routes = {
+  all: [],
+};
+
+const app: App = {};
+
+app.use = function (...middleware) {
+  const handle = {
+    path: pathToRegexp('/'),
+    stack: middleware,
+  };
+
+  routes.all.push(handle);
+};
+
+const match = function (pathname, routes) {
+  let stacks = [];
+  routes.forEach((route, index) => {
+    const matched = route.path.exec(pathname); //判断是否有匹配上
+    if (matched) {
+      stacks = stacks.concat(route.stack);
+    }
+  });
+
+  return stacks;
+};
+
+const handle = function (req, res, stack) {
+  const next = function (err?) {
+    if (err) {
+      //TODO 错误处理
+      return;
+    }
+
+    const middleware = stack.shift(); //拿到首个中间件
+
+    if (middleware) {
+      middleware(req, res, next);
+    }
+  };
+
+  next();
+};
+
+const middleware1 = function (req, res, next) {
+  console.log('middleware1', req.cookies);
+
+  next();
+};
+
+const middleware2 = function (req, res, next) {
+  console.log('middleware2', req.cookies);
+  next();
+};
+
+app.use(middleware2);
+app.use(cookieParse()); //第三方库
+app.use(middleware1);
+
+http
+  .createServer((req, res) => {
+    const pathname = url.parse(req.url).pathname;
+
+    //拿到中间件栈
+    const middlewareStack = match(pathname, routes.all);
+
+    if (middlewareStack.length) {
+      handle(req, res, middlewareStack);
+    }
+    res.end('');
+  })
+  .listen(8124);
+```

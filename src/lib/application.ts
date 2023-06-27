@@ -9,7 +9,7 @@ interface Response extends http.ServerResponse {
   test: string;
 }
 
-type HttpServerCallback = (req: Request, res: Response) => http.Server;
+type HttpServerCallback = (req: Request, res: Response) => http.Server | void;
 
 type Method =
   | 'ACL'
@@ -52,17 +52,17 @@ type Router = Record<Lowercase<Method>, RouterMatcher>;
 
 const router: Router = {} as Router;
 
-METHODS.forEach(method => {
-  router[method.toLowerCase()] = () => {
-    console.log(`Handling ${method} request`);
-  };
-});
-
 export interface Application extends Router {
   listen(port?: number, hostname?: string, backlog?: number, callback?: () => void): http.Server;
 }
 
 const app: Application = {} as Application;
+
+METHODS.forEach(method => {
+  app[method.toLowerCase()] = () => {
+    console.log(`Handling ${method} request`);
+  };
+});
 
 app.listen = function (...args) {
   const server = http.createServer((req, res) => {
@@ -72,3 +72,4 @@ app.listen = function (...args) {
 };
 
 export default app;
+

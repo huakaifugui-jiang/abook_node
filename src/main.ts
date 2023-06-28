@@ -1,7 +1,7 @@
-import express from 'express';
+// import express from 'express';
 
-// import express from './lib/myexpress';
-
+import express from './lib/myexpress';
+//
 const app = express();
 
 // app.get('/', function (req, res) {
@@ -13,9 +13,7 @@ const app = express();
 // });
 
 app.get('/a', (req, res) => {
-  console.log(req.method);
+  // console.log(app);
 });
 
 app.listen(8124);
-
-console.log(app._router)
